@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import 'rxjs/add/operator/filter';
 import {Replay, Command} from '@app/model';
 import {formatTime} from '@app/utils/common';
-import {HttpService} from '@app/services';
+import {AppService, HttpService} from '@app/services';
 
 declare var asciinema: any;
 
@@ -30,7 +30,7 @@ export class ElementReplayAsciicastComponent implements OnInit {
   commands: Command[];
   page = 0;
 
-  constructor(private route: ActivatedRoute, private _http: HttpService) {
+  constructor(private _appSvc: AppService, private route: ActivatedRoute, private _http: HttpService) {
     this.startAt = 0;
   }
 
@@ -62,6 +62,13 @@ export class ElementReplayAsciicastComponent implements OnInit {
     this.player.play();
     this.createTimer();
     this.getCommands(this.page);
+
+    let start_at = this._appSvc.getQueryString('start_at');
+    if (start_at) {
+      let command = new Command();
+      command.timestamp = parseInt(start_at, 10)
+      this.commandClick(command)
+    }
   }
 
   speedDown() {
