@@ -1,7 +1,7 @@
 import {Component, OnInit, Input} from '@angular/core';
 import * as Guacamole from 'guacamole-common-js/dist/guacamole-common';
 import {Replay, Command} from '@app/model';
-import {HttpService} from '@app/services';
+import {AppService, HttpService} from '@app/services';
 import {formatTime} from '@app/utils/common';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable, fromEvent, Subscription} from 'rxjs';
@@ -34,7 +34,7 @@ export class ElementReplayGuacamoleComponent implements OnInit {
   winSizeChange$: Observable<any>;
   winSizeSub: Subscription;
 
-  constructor(private _http: HttpService, private _translate: TranslateService) {}
+  constructor(private _appSvc: AppService, private _http: HttpService, private _translate: TranslateService) {}
 
   ngOnInit() {
     if (!this.replay.src) {
@@ -67,6 +67,13 @@ export class ElementReplayGuacamoleComponent implements OnInit {
       .subscribe(() => {
         this.recordingDisplay.onresize(this.recordingDisplay.getWidth(), this.recordingDisplay.getHeight());
       });
+    
+      let start_at = this._appSvc.getQueryString('start_at');
+    if (start_at) {
+      let command = new Command();
+      command.timestamp = parseInt(start_at, 10)
+      this.commandClick(command)
+    }
   }
 
   initRecording() {
